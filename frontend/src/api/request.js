@@ -2,12 +2,10 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '../router'
 
-// API 基础地址：
-// - 部署时通过 VITE_API_BASE 注入后端域名（如 https://xxx.run.tcloudbase.com）
-// - 本地开发无此变量时走 Vite 代理（/api -> http://localhost:3000/api）
-const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
+// 后端服务地址（云端云托管）——已写死，如后端域名变化只改这一行
+const API_BASE = 'https://campus-books-backend-330540-11-1509339634.sh.run.tcloudbase.com'
 
-// 通过 Vite 代理转发到 http://localhost:3000/api
+// 本地开发时想连本地后端，把上面那行改成：const API_BASE = ''
 const request = axios.create({
   baseURL: API_BASE + '/api',
   timeout: 15000
@@ -65,11 +63,10 @@ request.interceptors.response.use(
 
 export default request
 
-// 图片地址解析工具：处理相对路径（走代理）
+// 图片地址解析工具：上传的图片在后端服务器，拼接后端域名
 export function resolveImageUrl(path) {
   if (!path) return ''
   if (/^https?:\/\//i.test(path)) return path
-  // 上传的书籍图片存储在后端服务器（/uploads 开头），需要拼接后端域名
   if (path.startsWith('/uploads')) return API_BASE + path
   if (path.startsWith('/')) return path
   return '/' + path
