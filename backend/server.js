@@ -23,9 +23,9 @@ const PORT = process.env.PORT || 3000;
 
 // ========== 中间件 ==========
 
-// CORS 跨域允许
+// CORS 跨域允许（部署后前端在 EdgeOne/其他域名，后端在云托管，跨域必须放开）
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: true,
   credentials: true
 }));
 
@@ -51,14 +51,17 @@ app.get('/api/health', (req, res) => {
   res.json({ code: 0, message: '服务运行正常', data: { status: 'ok', time: new Date().toISOString() } });
 });
 
-// ========== 托管前端构建产物（单端口启动） ==========
+// ========== 托管前端构建产物（单端口启动；云托管分离部署时无 dist 自动跳过） ==========
+const fs = require('fs');
 const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
-app.use(express.static(frontendDist));
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
 
-// SPA 路由兜底：非 /api 请求都返回 index.html，交给前端路由处理
-app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
-  res.sendFile(path.join(frontendDist, 'index.html'));
-});
+  // SPA 路由兜底：非 /api 请求都返回 index.html，交给前端路由处理
+  app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
 
 // ========== 全局错误处理中间件 ==========
 app.use((err, req, res, next) => {
