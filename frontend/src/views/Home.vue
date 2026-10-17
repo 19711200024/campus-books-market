@@ -48,19 +48,19 @@
       <section class="section" v-loading="statsLoading">
         <el-row :gutter="16">
           <el-col :xs="8" :sm="8" :md="8">
-            <div class="stat-card">
+            <div class="stat-card" @click="goStat('books')" title="点击查看在售书籍">
               <div class="stat-num">{{ stats.total_books || 0 }}</div>
               <div class="stat-label">在售书籍</div>
             </div>
           </el-col>
           <el-col :xs="8" :sm="8" :md="8">
-            <div class="stat-card">
+            <div class="stat-card" @click="goStat('users')" title="点击注册新同学">
               <div class="stat-num">{{ stats.total_users || 0 }}</div>
               <div class="stat-label">注册同学</div>
             </div>
           </el-col>
           <el-col :xs="8" :sm="8" :md="8">
-            <div class="stat-card">
+            <div class="stat-card" @click="goStat('orders')" title="点击查看我的订单">
               <div class="stat-num">{{ stats.total_orders || 0 }}</div>
               <div class="stat-label">完成交易</div>
             </div>
@@ -156,6 +156,17 @@ function onSearch() {
 
 function goCategory(c) {
   router.push({ path: '/books', query: { category: c } })
+}
+
+// 统计卡片点击跳转：查看对应数据
+function goStat(type) {
+  if (type === 'books') {
+    router.push('/books')
+  } else if (type === 'users') {
+    router.push('/register')
+  } else if (type === 'orders') {
+    router.push('/my/orders')
+  }
 }
 
 async function loadStats() {
@@ -298,6 +309,13 @@ onMounted(() => {
   padding: 24px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(103, 194, 58, 0.2);
 }
 
 .stat-num {
