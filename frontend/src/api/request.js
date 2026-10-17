@@ -2,9 +2,14 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '../router'
 
+// API 基础地址：
+// - 部署时通过 VITE_API_BASE 注入后端域名（如 https://xxx.run.tcloudbase.com）
+// - 本地开发无此变量时走 Vite 代理（/api -> http://localhost:3000/api）
+const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
+
 // 通过 Vite 代理转发到 http://localhost:3000/api
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE + '/api',
   timeout: 15000
 })
 
@@ -64,6 +69,8 @@ export default request
 export function resolveImageUrl(path) {
   if (!path) return ''
   if (/^https?:\/\//i.test(path)) return path
+  // 上传的书籍图片存储在后端服务器（/uploads 开头），需要拼接后端域名
+  if (path.startsWith('/uploads')) return API_BASE + path
   if (path.startsWith('/')) return path
   return '/' + path
 }
