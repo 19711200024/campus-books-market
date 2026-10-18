@@ -132,6 +132,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import BookCard from '../components/BookCard.vue'
 import { CATEGORIES, CATEGORY_ICONS } from '../constants'
 import { booksApi } from '../api/books'
@@ -163,7 +164,12 @@ function goStat(type) {
   if (type === 'books') {
     router.push('/books')
   } else if (type === 'users') {
-    router.push('/register')
+    // 已登录时注册页会被路由守卫拦截，给出明确提示
+    if (localStorage.getItem('token')) {
+      ElMessage.info('当前已登录账号，如需注册新同学请先退出登录')
+    } else {
+      router.push('/register')
+    }
   } else if (type === 'orders') {
     router.push('/my/orders')
   }
